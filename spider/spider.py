@@ -1,5 +1,6 @@
 from spider.url_tools import urlTools
 from spider.parse_tools import *
+import traceback
 
 class spider:
     "根据功能爬去数据保存到数据库"
@@ -9,13 +10,19 @@ class spider:
     user = DB.get_collection("user")
 
     def __producer(self, url, buffer):
-        """网络请求数据"""
-        data = GET(url)
-        self.max_threads.acquire()
+        """请求某一页的所有博客文章数据，并加入到数据库"""
+        try:
+            data = parse_weibo(GET(url))
+        except Exception as e:
+            traceback.print_exc()
+            print(url)
+            return
+        # self.max_threads.acquire()
         self.weibo_lock.acquire()
-        buffer.append(data)
+        # buffer.append(data)
+        self.user.insert_many(data)
         self.weibo_lock.release()
-        self.max_threads.release()
+        # self.max_threads.release()
 
 
     def __consumer(self, buffer):
@@ -37,9 +44,14 @@ class spider:
         page_datas, handlers = [],[]
         for i in range(1,total):
             url = self.urlTool.weibo_user(uid, i)
-            thread = threading.Thread(target=self.__thread, args=(url,page_datas))
+            thread = threading.Thread(target=self.__producer, args=(url,page_datas))
             thread.start()
             handlers.append(thread)
-
+            if i%50== 0:
+                # 最大并发50个线程
+                for h in handlers:
+                    h.join()
+                handlers.clear()
+            
 
 

@@ -44,6 +44,7 @@ def parse_relations(data):
 
 
 def __parse_weibo_helper(blog):
+    """（一条）博客对象"""
     blogObject = {
         'id': blog['id'],
         'date': blog['created_at'],
@@ -55,21 +56,26 @@ def __parse_weibo_helper(blog):
         'repost': None
     }
     if 'retweeted_status' in blog:
-        blogObject['repost'] = parse_weibo(blog['retweeted_status'])
+        blogObject['repost'] = __parse_weibo_helper(blog['retweeted_status'])
     return blogObject
 
 
 def parse_weibo(data, init=False):
-    data = json.loads(data)
+    """
+    init为真则返回总页数用于初始化请求任务
+    否则返回对应url请求并清洗后的数据
+    """
+    if isinstance(data, str):
+        data = json.loads(data)
     if data['ok'] != 1:
         logger.warning("weibo数据请求失败")
         return False
     if init:
         return ceil(data['data']['cardlistInfo']['total']//10)
-    blogs = data['data']['cards']
+    blogs = data['data']['cards']  # 原始博客数据
     blogObjects = []
     for blog in blogs:
-        blog=blog['myblog']
+        blog=blog['mblog']
         blogObject = __parse_weibo_helper(blog)
         blogObjects.append(blogObject)
     return blogObjects
