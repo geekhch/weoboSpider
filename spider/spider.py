@@ -1,7 +1,7 @@
 from spider.url_tools import urlTools
 from spider.parse_tools import *
 
-class spider():
+class spider:
     "根据功能爬去数据保存到数据库"
     urlTool = urlTools()
     weibo_lock = threading.Lock()
@@ -16,8 +16,11 @@ class spider():
         buffer.append(data)
         self.weibo_lock.release()
         self.max_threads.release()
+
+
     def __consumer(self, buffer):
-        while True:
+        pass
+
 
 
     def __profile_spider(self, uid):
