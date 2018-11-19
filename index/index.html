@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+  <meta name="keywords" content="微博数据采集、微博数据分析、大数据工具、毕业论文" /> 
+  <meta name="description" content="微博数据采集工具，提供微博信息采集，微博数据分析助手，论文写作帮手，大数据挖掘工具" />
+  <title>微博数据采集工具-微博数据分析助手</title>
+  <link rel="stylesheet" type="text/css" href="./css/common.css" />
+ </head> 
+ <body class="home"> 
+  <!-- content start --> 
+  <div class="contain"> 
+   <div class="slider1"> 
+    <div class="main"> 
+     <div class="timg"> 
+      <h2>微博采集工具箱</h2> 
+      <h3>助你便捷获取微博数据</h3> 
+      <h4>一、选择您需要的工具，点击以下入口进入</h4>
+     </div> 
+     <div class="home_down">
+      <a href="http://www.gooseeker.com/res/softdetail_3.html" target="_blank" class="big">立即使用</a> 
+     </div> 
+    </div> 
+   </div>
+   <div class="member_fea"> 
+    <div class="main"> 
+     <div class="icon"> 
+      <a id="b" href="ExcelTemplate/UserIndexInfo.xlsx" target="_blank" class="mem_chart"> <i class="img"></i> <span class="title">微博博主主页内容</span></a>
+      <a onmouseover="change1();" href="ExcelTemplate/ResultOfKeyWord.xlsx" target="_blank" class="col_5 mem_rule"> <i class="img"></i> <span class="title">关键词搜索结果</span></a>
+      <a onmouseover="change1();" href="ExcelTemplate/ForwardCommentInfo.xlsx" target="_blank" class="col_5 mem_data"> <i class="img"></i> <span class="title">微博转发/评论信息</span></a>
+      <a onmouseover="change1();" href="ExcelTemplate/TopicSquire.xlsx" target="_blank" class="col_5 mem_safe"> <i class="img"></i> <span class="title">话题广场讨论内容</span></a>
+      <a onmouseover="change1();" href="ExcelTemplate/FansFollowingInfo.xlsx" target="_blank" class="col_5 mem_ta"> <i class="img"></i> <span class="title">粉丝与关注者资料</span></a>
+      <a onmouseover="change1();" href="ExcelTemplate/UserDetailInfo.xlsx" target="_blank" class="col_5 mem_other"> <i class="img"></i> <span class="title">微博博主详细资料</span></a>
+     </div>
+     <div>
+      <h4 style="color: #114d75">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;二、点击按钮上传Excel表格</h4>
+     </div>
+     <div class="icon1 icon3">
+      <form traget="_blank" class="other_diy2" id="uploadForm" enctype="multipart/form-data">
+       <i class="img"></i>
+       <span class="title" style="color: red">
+        <input id="file" type="file" name="file"/>
+       </span>
+      </form>
+      <form traget="_blank" class="other_diy" enctype="multipart/form-data">
+       <i class="img"></i>
+       <span class="title" style="color: red">
+        <input type="submit" name="submit" id="submit" value="upload"/>
+       </span>
+      </form>
+     </div>
+    </div>
+   </div> 
+   <div class="library"> 
+    <div class="main"> 
+     <div class="ad_hd1"> 
+      <h3>定制化微博小工具，涵盖用户信息、微博内容、博文转 / 评 / 赞信息等，</h3> 
+      <h2>集微库为你提供最全的微博数据。</h2> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="community"> 
+    <div class="main"> 
+     <div class="img1"> 
+      <dl> 
+       <dt>
+        实时监控微博热点，跟踪网络声音
+       </dt> 
+       <dd>
+        及时提供传播信息，为科研人员、企业营销运营部门、开发者、政府机构提供全方位的数据支持。
+       </dd> 
+       <dt>
+        海量微博数据采集，支持一键导出
+       </dt> 
+       <dd>
+        实时新增采集任务，两步操作开启采集，数据按需导出。
+       </dd> 
+       <dt>
+        微博数据应用平台，发现更多价值
+       </dt> 
+       <dd>
+        细致详尽的微博数据，可用于内容挖掘、舆情监控、营销监测和人群分析等。
+       </dd> 
+      </dl> 
+     </div> 
+     <div class="home_down"> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- content end -->
+ <script type="application/javascript">
+  //文件上传
+  $.ajax({
+    url: '/upload',
+    type: 'POST',
+    cache: false,
+    data: new FormData($('#uploadForm')[0]),
+    processData: false,
+    contentType: false
+}).done(function(res) {
+}).fail(function(res) {});
+ </script>
+ </body>
+</html>
