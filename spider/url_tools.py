@@ -19,7 +19,7 @@ class urlTools:
 
     def follow_user(self, uid, page=1):
         """
-        获取用户微博接口
+        获取用户关注博主列表接口
         """
         param = "containerid=231051_-_followers_-_%s&page=%d" % (str(uid), page)
         return self.userURL + param
