@@ -6,6 +6,7 @@
   <meta name="description" content="微博数据采集工具，提供微博信息采集，微博数据分析助手，论文写作帮手，大数据挖掘工具" />
   <title>微博数据采集工具-微博数据分析助手</title>
   <link rel="stylesheet" type="text/css" href="./css/common.css" />
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
  </head> 
  <body class="home"> 
   <!-- content start --> 
@@ -26,11 +27,11 @@
     <div class="main"> 
      <div class="icon"> 
       <a id="b" href="ExcelTemplate/UserIndexInfo.xlsx" target="_blank" class="mem_chart"> <i class="img"></i> <span class="title">微博博主主页内容</span></a>
-      <a onmouseover="change1();" href="ExcelTemplate/ResultOfKeyWord.xlsx" target="_blank" class="col_5 mem_rule"> <i class="img"></i> <span class="title">关键词搜索结果</span></a>
-      <a onmouseover="change1();" href="ExcelTemplate/ForwardCommentInfo.xlsx" target="_blank" class="col_5 mem_data"> <i class="img"></i> <span class="title">微博转发/评论信息</span></a>
-      <a onmouseover="change1();" href="ExcelTemplate/TopicSquire.xlsx" target="_blank" class="col_5 mem_safe"> <i class="img"></i> <span class="title">话题广场讨论内容</span></a>
-      <a onmouseover="change1();" href="ExcelTemplate/FansFollowingInfo.xlsx" target="_blank" class="col_5 mem_ta"> <i class="img"></i> <span class="title">粉丝与关注者资料</span></a>
-      <a onmouseover="change1();" href="ExcelTemplate/UserDetailInfo.xlsx" target="_blank" class="col_5 mem_other"> <i class="img"></i> <span class="title">微博博主详细资料</span></a>
+      <a href="ExcelTemplate/ResultOfKeyWord.xlsx" target="_blank" class="col_5 mem_rule"> <i class="img"></i> <span class="title">关键词搜索结果</span></a>
+      <a href="ExcelTemplate/ForwardCommentInfo.xlsx" target="_blank" class="col_5 mem_data"> <i class="img"></i> <span class="title">微博转发/评论信息</span></a>
+      <a href="ExcelTemplate/TopicSquire.xlsx" target="_blank" class="col_5 mem_safe"> <i class="img"></i> <span class="title">话题广场讨论内容</span></a>
+      <a href="ExcelTemplate/FansFollowingInfo.xlsx" target="_blank" class="col_5 mem_ta"> <i class="img"></i> <span class="title">粉丝与关注者资料</span></a>
+      <a href="ExcelTemplate/UserDetailInfo.xlsx" target="_blank" class="col_5 mem_other"> <i class="img"></i> <span class="title">微博博主详细资料</span></a>
      </div>
      <div>
       <h4 style="color: #114d75">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;二、点击按钮上传Excel表格</h4>
@@ -39,13 +40,7 @@
       <form traget="_blank" class="other_diy2" id="uploadForm" enctype="multipart/form-data">
        <i class="img"></i>
        <span class="title" style="color: red">
-        <input id="file" type="file" name="file"/>
-       </span>
-      </form>
-      <form traget="_blank" class="other_diy" enctype="multipart/form-data">
-       <i class="img"></i>
-       <span class="title" style="color: red">
-        <input type="submit" name="submit" id="submit" value="upload"/>
+        <input id="upfile" type="file" name="upfile" onchange="fileUpload();"/>
        </span>
       </form>
      </div>
@@ -90,16 +85,44 @@
   </div> 
   <!-- content end -->
  <script type="application/javascript">
-  //文件上传
-  $.ajax({
-    url: '/upload',
-    type: 'POST',
-    cache: false,
-    data: new FormData($('#uploadForm')[0]),
-    processData: false,
-    contentType: false
-}).done(function(res) {
-}).fail(function(res) {});
+  function fileUpload(){
+		var fileName = $("#upfile").val();
+		if(fileName == null || fileName==""){
+			alert("请选择文件");
+		}else{
+			var fileType = fileName.substr(fileName.length-4,fileName.length);
+		if(fileType == ".xls" || fileType == "xlsx"){
+			 var formData = new FormData();
+			 // 在django端的file名称为"file"
+			 formData.append("file",$("#upfile").prop("files")[0]);
+			 $.ajax({
+			 	type:"post",
+			 	url:"http://127.0.0.1:8000/file/upload/",
+			 	data:formData,
+			 	cache:false,
+			 	processData:false,
+			 	contentType:false,
+			 	dataType:"json",
+			 	success:function(data){
+			 		if(null != data){
+			 			if(data.dataStatus == "1"){
+			 				if(confirm("上传成功！")){
+			 					window.location.reload();
+			 				}
+			 			}else{
+			 				alert("上传失败！");
+			 			}
+			 		}
+			 	},
+			 	error:function(){
+			 		alert("上传失败！");
+			 	}
+			 });
+		}else{
+			alert("上传文件类型错误！");
+		}
+		}
+	}
  </script>
  </body>
 </html>
