@@ -10,9 +10,9 @@ def upload_file(request):
         print("post request")
         f = request.FILES['file']
         workbook = xlrd.open_workbook(filename=None, file_contents=f.read())
-        worksheets = workbook.sheet_names()
-        print('worksheets is %s' % worksheets)
+        table = workbook.sheet_by_index(0)  # 取第一张工作簿
+        print(table.cell(0,0).value)
         return HttpResponse("hhh")
     else:
         print("get request")
-        return HttpResponse("please use GET method")
+        return render(request, 'index.html')
