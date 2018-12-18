@@ -62,7 +62,5 @@ class spider:
 
 if __name__ == "__main__":
     pass
-    sp = spider()
-    sp.fans_and_follow(1700648435)
 
     
