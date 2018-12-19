@@ -1,5 +1,5 @@
 import json
-from spider.utils import *
+from utils import *
 from math import ceil
 
 def parse_profile(data):
@@ -26,21 +26,23 @@ def parse_profile(data):
     userObject['weibo_api'] = "containerid=%s" % tabsInfo[1]['containerid']
     userObject['album_api'] = "containerid=%s" % tabsInfo[2]['containerid']
     userObject['weibo'] = []
+    userObject['fans'] = []
+    userObject['follows'] = []
     return userObject
 
 
-def parse_relations(data):
-    """
-    解析粉丝或关注人的uids,
-    init模式获取数据总页数，方便多线程
-    """
-    data = json.loads(data)
-    if data['ok'] != 1:
-        logger.warning("relations数据请求错误")
-        return False
+# def parse_relations(data):
+#     """
+#     解析粉丝或关注人的uids,
+#     init模式获取数据总页数，方便多线程
+#     """
+#     data = json.loads(data)
+#     if data['ok'] != 1:
+#         logger.warning("relations数据请求错误")
+#         return False
 
-    friends = data['data']['cards'][-1]['card_group']
-    return [user['user']['id'] for user in friends]
+#     friends = data['data']['cards'][-1]['card_group']
+#     return [user['user']['id'] for user in friends]
 
 
 def __parse_weibo_helper(blog):
@@ -52,10 +54,10 @@ def __parse_weibo_helper(blog):
         'reposts_count': blog['reposts_count'],
         'comments_count': blog['comments_count'],
         'attitudes_count': blog['attitudes_count'],
-        'text': blog['text'],
-        'repost': None
+        'text': blog['text']
     }
     if 'retweeted_status' in blog:
+        # 递归调用获取转发
         blogObject['repost'] = __parse_weibo_helper(blog['retweeted_status'])
     return blogObject
 
@@ -81,9 +83,19 @@ def parse_weibo(data, init=False):
     return blogObjects
 
 
-def parse_follow(data):
-    data = json.loads(data)
-
+def parse_user(data):
+    cards = data['data']['cards']
+    user_ids = []
+    for card in cards:
+        if card['itemid']:
+            # print(card)
+            try:
+                for group in card['card_group']:
+                    user_ids.append(group['user']['id'])
+            except:
+                print(card)
+    return user_ids
+    
 
 if __name__ == '__main__':
     pass

@@ -1,9 +1,10 @@
-from spider.utils import DB, HOST
+from utils import DB, HOST
 
 class urlTools:
     """构造获取数据的url"""
-    userURL = HOST + "/api/container/getIndex?"
-    user = DB.get_collection("user")
+    def __init__(self):
+        self.userURL = HOST + "/api/container/getIndex?"
+        self.user = DB.get_collection("user")
 
     def profile_user(self, uid):
         """获取某个用户基本资料接口"""
@@ -14,8 +15,8 @@ class urlTools:
         获取用户微博接口
         """
         containerid = self.user.find_one({'_id': uid}, {'weibo_api': 1})['weibo_api']
-        print(containerid)
         return self.userURL + "%s&page=%d"%(containerid, page)
+
 
     def follow_user(self, uid, page=1):
         """
@@ -28,7 +29,7 @@ class urlTools:
         """
         获取用户微博接口
         """
-        param = "containerid=231051_-_fans_-_%s&since_id=%d" % (str(uid), page)
+        param = "containerid=231051_-_fans_-_%s&since_id=%d" % (str(uid), page) # fans和follow翻页参数不一样
         return self.userURL + param
 
 
