@@ -18,6 +18,6 @@ if __name__ == '__main__':
     # 4. 邮件发送附件
     # MAIL('发送附件测试','605725874@qq.com', './assets/profile/profile_12-19-074734.xls')
 
-    # 5. 生成词云
+    # 5. 生成词云，词云内容还需要调整
     # path = xls_gener.word_cloud(6029786152)
 
