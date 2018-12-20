@@ -1,6 +1,6 @@
 import json
-from WeiboSpider.Spider.utils import *
-from math import ceil
+from ..utils import *
+from math import ceil  # 向上取整
 
 def parse_profile(data):
     """
@@ -29,20 +29,6 @@ def parse_profile(data):
     userObject['fans'] = []
     userObject['follows'] = []
     return userObject
-
-
-# def parse_relations(data):
-#     """
-#     解析粉丝或关注人的uids,
-#     init模式获取数据总页数，方便多线程
-#     """
-#     data = json.loads(data)
-#     if data['ok'] != 1:
-#         logger.warning("relations数据请求错误")
-#         return False
-
-#     friends = data['data']['cards'][-1]['card_group']
-#     return [user['user']['id'] for user in friends]
 
 
 def __parse_weibo_helper(blog):

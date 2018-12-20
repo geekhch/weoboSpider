@@ -1,5 +1,7 @@
-import requests, logging ,smtplib, traceback
-from WeiboSpider.Spider.seettings import *
+import os
+
+import requests, logging, smtplib, traceback
+from Spider.seettings import *
 from pymongo import MongoClient
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -12,7 +14,7 @@ def __get_logger(name='wbLog'):
     console = logging.StreamHandler()
     console.setFormatter(fmt)
     logger = logging.getLogger(name)
-    logger.setLevel("INFO")
+    logger.setLevel(logging.INFO)
     logger.addHandler(console)
     return logger
 
@@ -26,12 +28,11 @@ def GET(url):
 # logger
 logger = __get_logger()
 
-
 # MongoDB数据库
 DB = MongoClient(DB_HOST, DB_PORT)[DB_NAME]
 
 
-def MAIL(subject , receiver, file_path):
+def MAIL(subject, text, receiver, file_path):
     """发送邮件"""
     HOST = 'smtp.163.com'
     MAIL_USER = '15682177109@163.com'
@@ -41,9 +42,9 @@ def MAIL(subject , receiver, file_path):
 
     message = MIMEMultipart()
     message['Subject'] = Header(subject, 'utf-8')
-    message['From'] =  "微博爬虫附件"+"<SCU Tracker>"
+    message['From'] = "微博爬虫附件" + "<SCU Tracker>"
     message['To'] = ";".join(receivers[:1])
-    message.attach(MIMEText("微博爬虫分析，附件反馈。", "HTML", 'utf-8'))
+    message.attach(MIMEText(text, "HTML", 'utf-8'))
 
     # 构造附件1，传送当前目录下的 test.txt 文件
     att1 = MIMEText(open(file_path, 'rb').read(), 'base64', 'utf-8')
@@ -53,14 +54,20 @@ def MAIL(subject , receiver, file_path):
     message.attach(att1)
 
     try:
-        smtpObj = smtplib.SMTP() 
-        smtpObj.connect(HOST, 25)    # 25 为 SMTP 端口号
-        smtpObj.login(MAIL_USER,MAIL_PASS)  
+        smtpObj = smtplib.SMTP()
+        smtpObj.connect(HOST, 25)  # 25 为 SMTP 端口号
+        smtpObj.login(MAIL_USER, MAIL_PASS)
         smtpObj.sendmail(sender, receivers, message.as_string())
         logger.info("邮件发送成功")
     except:
-        logger.warning(subject+"   发送失败")
+        logger.warning(subject + "   发送失败")
         logger.warning(traceback.format_exc())
+
+
+class path_manager:
+    ROOT = os.path.abspath('.')
+    ANALYSIS = os.path.join(ROOT, 'Spider/analysis')
+    ASSETS = os.path.join(ROOT, 'Spider/assets')
 
 
 if __name__ == '__main__':
