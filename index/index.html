@@ -26,7 +26,7 @@
    <div class="member_fea"> 
     <div class="main"> 
      <div class="icon"> 
-      <a id="b" href="ExcelTemplate/UserIndexInfo.xlsx" target="_blank" class="mem_chart"> <i class="img"></i> <span class="title">微博博主主页内容</span></a>
+      <a href="ExcelTemplate/UserIndexInfo.xlsx" target="_blank" class="mem_chart"> <i class="img"></i> <span class="title">微博博主主页内容</span></a>
       <a href="ExcelTemplate/ResultOfKeyWord.xlsx" target="_blank" class="col_5 mem_rule"> <i class="img"></i> <span class="title">关键词搜索结果</span></a>
       <a href="ExcelTemplate/ForwardCommentInfo.xlsx" target="_blank" class="col_5 mem_data"> <i class="img"></i> <span class="title">微博转发/评论信息</span></a>
       <a href="ExcelTemplate/TopicSquire.xlsx" target="_blank" class="col_5 mem_safe"> <i class="img"></i> <span class="title">话题广场讨论内容</span></a>
@@ -106,7 +106,7 @@
 			 	success:function(data){
 			 		if(null != data){
 			 			if(data.dataStatus == "1"){
-			 				if(confirm("上传成功！")){
+			 				if(confirm("上传成功，爬取数据已发送至邮箱！")){
 			 					window.location.reload();
 			 				}
 			 			}else{
