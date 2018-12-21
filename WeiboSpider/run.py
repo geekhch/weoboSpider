@@ -1,6 +1,6 @@
-from Spider.spider.spider import Spider
-from Spider.analysis.dataView import DataView
-from Spider.utils import *
+from .Spider.spider.spider import Spider
+from .Spider.analysis.dataView import DataView
+from .Spider.utils import *
 
 if __name__ == '__main__':
     xls_gener = DataView()

@@ -1,7 +1,7 @@
 import os
 
 import requests, logging, smtplib, traceback
-from Spider.seettings import *
+from .seettings import *
 from pymongo import MongoClient
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart

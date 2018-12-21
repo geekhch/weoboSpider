@@ -2,11 +2,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from WeiboSpider.Spider.analysis import dataView
-from WeiboSpider.Spider.utils import *
+from Spider.analysis.dataView import DataView
+from Spider.utils import *
 import xlrd
 
-xls_gener = dataView()
+xls_gener = DataView()
 
 # 接受前端传来的文件
 @csrf_exempt
