@@ -1,7 +1,11 @@
-from WeiboSpider.Spider.spider import urlTools
+import time, json
+from ..utils import __get_logger, DB, GET
+from .url_tools import urlTools
+from .parse_tools import parse_profile, parse_user, parse_weibo
 import threading
 import traceback
 
+logger = __get_logger("spider")
 
 class Spider:
     "根据功能爬去数据保存到数据库"
@@ -9,7 +13,7 @@ class Spider:
     weibo_lock = threading.Lock()  # 数据库写入锁
     user_col = DB.get_collection("user")
 
-    def __init__(self, uid):
+    def __init__(self, uid, blogs = True, fans_follow = True):
         """
         一键获取用户基本信息、所有微博、关注用户uid列表、粉丝用户uid列表，保存到db
         """
@@ -18,13 +22,22 @@ class Spider:
         self.weibo_lock = threading.Lock()  # 数据库写入锁
         self.user_col = DB.get_collection("user")
         self.__end_page = False  # 线程控制使用成员变量
+        logger.info("初始化%d" % uid)
 
         if not self.user_col.find_one({'_id': uid}):
             url = self.urlTool.profile_user(uid)
             data = parse_profile(GET(url))
-            self.user_col.replace_one({'_id': uid}, data, upsert=True)  # 新增字段而不是完全替换
-            self.__weibo_blogs()
-            self.__fans_and_follow()
+            if data:
+                self.user_col.replace_one({'_id': uid}, data, upsert=True)  # 新增字段而不是完全替换
+            else:
+                logger.info("profile无法解析：%s" % data)
+                time.sleep(2)
+                return
+
+        if blogs:
+            self.weibo_blogs()
+        if fans_follow:
+            self.fans_and_follow()
 
 
 
@@ -52,27 +65,36 @@ class Spider:
             url = self.urlTool.fans_user(self.uid, current_page)
         else:
             print("人群类型参数错误")
-            exit(1)
+            exit(-1)
             return
-        print(url)
+        logger.info(url)
+
         data = GET(url)
         try:
             data = json.loads(data)
             # 判断是否到了尾页
-            if data['ok'] == 0:
-                if 'msg' in data and data['msg'] == '这里还没有内容':
-                    self.__end_page = True
-                    return None
-                else:
-                    print("未知错误", data)
-
-            user_ids = parse_user(data)
-            self.weibo_lock.acquire()
-            for user_id in user_ids:
-                self.user_col.update({'_id': self.uid}, {'$push': {type: user_id}})  # 将user追加到关注或粉丝列表
-            self.weibo_lock.release()
         except:
+            print(data)
             traceback.print_exc()
+            self.__end_page = True
+
+        if data['ok'] == 0:
+            if 'msg' in data and data['msg'] == '这里还没有内容':
+                self.__end_page = True
+                return None
+            if 'msg' in data and data['msg'] == '请求过于频繁,歇歇吧':
+                logger.info("线程请求频繁，开始休眠1s")
+                time.sleep(1)
+            else:
+                print("未知错误", data)
+                exit(-2)
+
+        user_ids = parse_user(data)
+        self.weibo_lock.acquire()
+        for user_id in user_ids:
+            self.user_col.update({'_id': self.uid}, {'$push': {type: user_id}})  # 将user追加到关注或粉丝列表
+        self.weibo_lock.release()
+
 
     def join_threads(self, thread_count, thread_list, force = False):
         if thread_count % 50 == 0 or force:
@@ -82,7 +104,7 @@ class Spider:
             return 1
         return thread_count+1
 
-    def __fans_and_follow(self):
+    def fans_and_follow(self):
         self.__end_page = False  # 线程控制使用成员变量
         current_page = 1
         logger.info("开始获取关注列表")
@@ -116,12 +138,12 @@ class Spider:
 
 
 
-    def __weibo_blogs(self):
+    def weibo_blogs(self):
         # 获取用户基本信息以及该用户发布或转发的微博
         url = self.urlTool.weibo_user(self.uid)
         data = GET(url)
         total_pages = parse_weibo(data, init=True)  # 获取总页数
-
+        logger.info("开始获取微博内容")
         page_datas, handlers = [], []
         for i in range(1, total_pages):
             url = self.urlTool.weibo_user(self.uid, i)
@@ -134,6 +156,8 @@ class Spider:
                 for h in handlers:
                     h.join()
                 handlers.clear()
+                logger.info("主流程休眠。。。。")
+                time.sleep(3)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from WeiboSpider.Spider.utils import DB, HOST
+from ..utils import DB, HOST
 
 class urlTools:
     """构造获取数据的url"""
