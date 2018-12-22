@@ -32,7 +32,7 @@ logger = __get_logger()
 DB = MongoClient(DB_HOST, DB_PORT)[DB_NAME]
 
 
-def MAIL(subject, text, receiver, file_path):
+def MAIL(subject, receiver, file_path):
     """发送邮件"""
     HOST = 'smtp.163.com'
     MAIL_USER = '15682177109@163.com'
@@ -44,7 +44,7 @@ def MAIL(subject, text, receiver, file_path):
     message['Subject'] = Header(subject, 'utf-8')
     message['From'] = "微博爬虫附件" + "<SCU Tracker>"
     message['To'] = ";".join(receivers[:1])
-    message.attach(MIMEText(text, "HTML", 'utf-8'))
+    message.attach(MIMEText('weibo spider附件', "HTML", 'utf-8'))
 
     # 构造附件1，传送当前目录下的 test.txt 文件
     att1 = MIMEText(open(file_path, 'rb').read(), 'base64', 'utf-8')

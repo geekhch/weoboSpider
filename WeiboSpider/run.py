@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     # 2. 根据uid列表生成用户基本profile信息的excel文件
     # 对应UserBaseInfo
-    uids = [6029786152, 5102089477, 2988799167,3554683503]
+    uids = [6029786152, 5102089477, 2988799167, 3554683503]
     path = xls_gener.profile_to_xls(uids)
 
     # 3. 邮件发送附件

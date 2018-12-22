@@ -16,14 +16,16 @@ class DataView:
         wc = WordCloud(
             background_color=color,  # 设置背景颜色
             max_words=300,  # 设置最大显示的词云数
-            font_path='C:\\Windows\\Fonts\\simkai.ttf',  # 这种字体都在电脑字体中，一般路径
+            # font_path='C:\\Windows\\Fonts\\simkai.ttf',  # 这种字体都在电脑字体中，一般路径
+            font_path = '/System/Library/Fonts/PingFang.ttc',
             mask=cv2.imread(path_manager.ANALYSIS + '/lemon.jpg'),
             random_state=30,
         )
 
         # 提取博文并去掉HTML标签
         texts = ""
-        if not self.user_col.find_one({'_id': uid}, {'weibo': True,})['weibo']:
+        test = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})
+        if not test or not test['weibo']:
             Spider(uid, blogs=True, fans_follow=False)
         blogs = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})['weibo']
         for blog in blogs:
@@ -57,7 +59,8 @@ class DataView:
         for k in info:
             blogs_data[k] = []
 
-        if not self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})['weibo']:
+        test = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})
+        if not test or not test['weibo']:
             Spider(uid)
         blogs = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})['weibo']
 
@@ -95,7 +98,8 @@ class DataView:
 
     def fans_profile_to_xls(self, uid):
         """将用户的粉丝和关注者基本信息生成excel"""
-        if not self.user_col.find_one({'_id':uid},{'fans':True}):
+        test = self.user_col.find_one({'_id': uid}, {'fans': True, '_id': False})
+        if not test or not test['fans']:
             Spider(uid)
         user_list = self.user_col.find_one({'_id':uid},{'fans':True})
         path = path_manager.ASSETS + '/fans/fans_%s_%s.xls' %(time.strftime('%m-%d-%H%M%S'),str(uid))
@@ -103,7 +107,8 @@ class DataView:
 
     def folows_profile_to_xls(self, uid):
         """将用户的粉丝和关注者基本信息生成excel"""
-        if not self.user_col.find_one({'_id':uid},{'fans':True}):
+        test = self.user_col.find_one({'_id': uid}, {'follows': True, '_id': False})
+        if not test or not test['follows']:
             Spider(uid)
         user_list = self.user_col.find_one({'_id':uid},{'follows':True})
         path = path_manager.ASSETS + '/follows/follows_%s_%s.xls' %(time.strftime('%m-%d-%H%M%S'),str(uid))

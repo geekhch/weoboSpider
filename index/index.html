@@ -106,20 +106,32 @@
 			 	success:function(data){
 			 		if(null != data){
 			 			if(data.dataStatus == "1"){
-			 				if(confirm("上传成功，爬取数据已发送至邮箱！")){
+			 				if(confirm("爬取成功，爬取数据已发送至邮箱！")){
 			 					window.location.reload();
 			 				}
 			 			}else{
-			 				alert("上传失败！");
+			 			    if(data.dataStatus == "2") {
+			 			        if(confirm("爬取失败，uid不能为空")) window.location.reload();
+                            }
+			 			    if(data.dataStatus == "3") {
+			 			        if(confirm("爬取失败，接收邮箱不能为空")) window.location.reload();
+                            }
+                            if(data.dataStatus == "4"){
+                                if(confirm("爬取失败，接收邮箱格式错误")) window.location.reload();
+                            }
 			 			}
 			 		}
 			 	},
 			 	error:function(){
-			 		alert("上传失败！");
+			 	    if(confirm("上传失败！请检查网络!")){
+                        window.location.reload();
+                    }
 			 	}
 			 });
 		}else{
-			alert("上传文件类型错误！");
+            if(confirm("上传文件类型错误！")){
+                window.location.reload();
+            }
 		}
 		}
 	}
