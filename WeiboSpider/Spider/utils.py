@@ -21,7 +21,7 @@ def __get_logger(name='wbLog'):
 
 def GET(url):
     """GET请求"""
-    response = requests.get(url)
+    response = requests.get(url, {'timeout':2})
     return response.content.decode('utf-8')
 
 

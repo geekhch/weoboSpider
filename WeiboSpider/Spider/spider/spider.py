@@ -151,13 +151,10 @@ class Spider:
             thread = threading.Thread(target=self.__weibo_spider_helper, args=(url, page_datas))
             thread.start()
             handlers.append(thread)
-            if i % 50 == 0:
-                # 控制最大并发50个线程
-                for h in handlers:
-                    h.join()
-                handlers.clear()
-                logger.info("主流程休眠。。。。")
-                time.sleep(3)
+            time.sleep(0.1)
+        logger.info('blog爬取完毕，开始线程同步')
+        for h in handlers:
+            h.join()
 
 
 if __name__ == "__main__":

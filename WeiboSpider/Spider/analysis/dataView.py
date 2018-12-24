@@ -3,6 +3,7 @@ from ..spider.spider import Spider
 import pandas as pd
 import time, json, cv2, re, jieba
 from jieba import posseg
+import thulac
 from wordcloud import WordCloud
 
 
@@ -11,13 +12,19 @@ class DataView:
         # 数据库集合
         self.user_col = DB.get_collection("user")
 
+    def __cut(self, text_list):
+        t = thulac.thulac()
+        for sentence in text_list:
+            for pair in t.cut(sentence):
+                yield pair
+
     def word_cloud(self, uid, color='black'):
         """返回生成的词云图片的路径"""
         wc = WordCloud(
             background_color=color,  # 设置背景颜色
-            max_words=300,  # 设置最大显示的词云数
-            # font_path='C:\\Windows\\Fonts\\simkai.ttf',  # 这种字体都在电脑字体中，一般路径
-            font_path = '/System/Library/Fonts/PingFang.ttc',
+            max_words=200,  # 设置最大显示的词云数
+            font_path='C:\\Windows\\Fonts\\STXINWEI.TTF',  # 这种字体都在电脑字体中，一般路径
+            # font_path = '/System/Library/Fonts/PingFang.ttc',
             mask=cv2.imread(path_manager.ANALYSIS + '/lemon.jpg'),
             random_state=30,
         )
@@ -30,20 +37,44 @@ class DataView:
         blogs = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})['weibo']
         for blog in blogs:
             texts += blog['text']
-        texts = re.sub(r'<.*?>', '', texts)
-        # 分词、去停用词、统计词频
+        texts = re.sub(r'<.*?>', '。', texts)
+        texts = texts.split('。')
+
+        # jieba分词、去停用词、统计词频
+        # jieba.add_word('微博')
+        # jieba.add_word('王一博')
+        # jieba.add_word('肖战')
+        # stopw = json.load(open(path_manager.ANALYSIS + '/stop_words.json', encoding='utf8'))  # 加载停用词
+        # words_flag = posseg.cut(texts)
+        # word_frequence = {}
+        # for w in words_flag:
+        #     if not w.word in stopw and not w.flag in ['w', 'c', 'y','o', 'zg', 'd'] and len(w.word)>1:
+        #         if w.word in word_frequence:
+        #             word_frequence[w.word] += 1
+        #         else:
+        #             word_frequence[w.word] = 1
+        # if len(word_frequence)<1:
+        #     print("该用户没有发布微博！")
+        #     return None
+
+        # thulac分词
+        # t = thulac.thulac()
         stopw = json.load(open(path_manager.ANALYSIS + '/stop_words.json', encoding='utf8'))  # 加载停用词
-        words_flag = posseg.cut(texts)
+
+        print('开始分词')
+        # words_flag = t.cut(texts)
+        # print('分词结束')
         word_frequence = {}
-        for w in words_flag:
-            if not w.word in stopw and not w.flag in ['w', 'c', 'y','o', 'zg']:
-                if w.word in word_frequence:
-                    word_frequence[w.word] += 1
+        for w,f in self.__cut(texts):
+            if not w in stopw and not f in ['w', 'c', 'y','o', 'u', 'p','d','q','zg'] and len(w)>1:
+                if w in word_frequence:
+                    word_frequence[w] += 1
                 else:
-                    word_frequence[w.word] = 1
+                    word_frequence[w] = 1
         if len(word_frequence)<1:
             print("该用户没有发布微博！")
             return None
+
         wcf = wc.generate_from_frequencies(word_frequence, 500)
         path = path_manager.ASSETS + '/word_clouds/cloud_%s_%s.png' % (time.strftime('%m-%d-%H%M%S'),str(uid))
         wcf.to_file(path)

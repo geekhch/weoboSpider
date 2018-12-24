@@ -57,12 +57,19 @@ def parse_weibo(data, init=False):
         data = json.loads(data)
     if data['ok'] != 1:
         logger.warning("weibo数据请求失败")
-        return False
+        return []
+    if 'itemid' in data and not data['itemid']:
+        logger.warning('itemid为空，放弃该数据')
+        return []
     if init:
         return ceil(data['data']['cardlistInfo']['total']//10)
     blogs = data['data']['cards']  # 原始博客数据
     blogObjects = []
     for blog in blogs:
+        if not 'mblog' in blog:
+            logger.warning('无效blog对象')
+            print(blog)
+            continue
         blog=blog['mblog']
         blogObject = __parse_weibo_helper(blog)
         blogObjects.append(blogObject)
