@@ -22,10 +22,10 @@ class DataView:
         """返回生成的词云图片的路径"""
         wc = WordCloud(
             background_color=color,  # 设置背景颜色
-            max_words=200,  # 设置最大显示的词云数
-            font_path='C:\\Windows\\Fonts\\STXINWEI.TTF',  # 这种字体都在电脑字体中，一般路径
+            # max_words=500,  # 设置最大显示的词云数 #simfang.ttf
+            font_path='C:\\Windows\\Fonts\\simfang.ttf',  # 这种字体都在电脑字体中，一般路径
             # font_path = '/System/Library/Fonts/PingFang.ttc',
-            mask=cv2.imread(path_manager.ANALYSIS + '/lemon.jpg'),
+            mask=cv2.imread(path_manager.ANALYSIS + '/temp/merry.jpg'),
             random_state=30,
         )
 
@@ -66,7 +66,7 @@ class DataView:
         # print('分词结束')
         word_frequence = {}
         for w,f in self.__cut(texts):
-            if not w in stopw and not f in ['w', 'c', 'y','o', 'u', 'p','d','q','zg'] and len(w)>1:
+            if not w in stopw and not f in ['w', 'c', 'y']: # and len(w)>1:
                 if w in word_frequence:
                     word_frequence[w] += 1
                 else:
@@ -75,7 +75,7 @@ class DataView:
             print("该用户没有发布微博！")
             return None
 
-        wcf = wc.generate_from_frequencies(word_frequence, 500)
+        wcf = wc.generate_from_frequencies(word_frequence)
         path = path_manager.ASSETS + '/word_clouds/cloud_%s_%s.png' % (time.strftime('%m-%d-%H%M%S'),str(uid))
         wcf.to_file(path)
         return path

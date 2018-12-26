@@ -10,7 +10,7 @@ class urlTools:
         """获取某个用户基本资料接口"""
         return self.userURL + "type=uid&value=%s" % str(uid)
 
-    def weibo_user(self, uid, page=1):
+    def blogs_user(self, uid, page=1):
         """
         获取用户微博接口
         """
@@ -35,6 +35,6 @@ class urlTools:
 
 if __name__ == '__main__':
     object = urlTools()
-    url = object.weibo_user(5102089477)
+    url = object.blogs_user(5102089477)
     print("weibo",url)
     print("fans",object.fans_user(5102089477))

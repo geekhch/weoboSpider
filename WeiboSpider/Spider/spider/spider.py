@@ -140,13 +140,13 @@ class Spider:
 
     def weibo_blogs(self):
         # 获取用户基本信息以及该用户发布或转发的微博
-        url = self.urlTool.weibo_user(self.uid)
+        url = self.urlTool.blogs_user(self.uid)
         data = GET(url)
         total_pages = parse_weibo(data, init=True)  # 获取总页数
         logger.info("开始获取微博内容")
         page_datas, handlers = [], []
         for i in range(1, total_pages):
-            url = self.urlTool.weibo_user(self.uid, i)
+            url = self.urlTool.blogs_user(self.uid, i)
             logger.info(url)
             thread = threading.Thread(target=self.__weibo_spider_helper, args=(url, page_datas))
             thread.start()
