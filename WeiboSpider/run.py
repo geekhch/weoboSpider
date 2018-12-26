@@ -1,5 +1,6 @@
 # from .Spider.spider.spider import Spider
 from Spider.analysis.dataView import DataView
+from tqdm import tqdm
 # from .Spider.utils import *
 
 if __name__ == '__main__':
@@ -20,7 +21,7 @@ if __name__ == '__main__':
 
     # 4. 生成词云，返回词云图片路径
     # 对应UserWorldCloud
-    path = xls_gener.word_cloud(6029786152)
+    path = xls_gener.word_cloud(2695174081, flush=True)
 
     # 5. 根据uid生成粉丝基本信息的excel
     # 对应FansInfo
