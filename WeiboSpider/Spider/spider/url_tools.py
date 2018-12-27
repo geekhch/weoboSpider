@@ -32,6 +32,13 @@ class urlTools:
         param = "containerid=231051_-_fans_-_%s&since_id=%d" % (str(uid), page) # fans和follow翻页参数不一样
         return self.userURL + param
 
+    def attitudes(self, mid, page):
+        """
+        获取微博点赞列表 (blog_id, 页码)
+        """
+        return "https://m.weibo.cn/api/attitudes/show?id=%s&page=%d" % (str(mid), page)
+
+
 
 if __name__ == '__main__':
     object = urlTools()

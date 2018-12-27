@@ -4,6 +4,7 @@ import pandas as pd
 import time, json, cv2, re, jieba
 from jieba import posseg
 import thulac
+from tqdm import tqdm
 from wordcloud import WordCloud
 
 
@@ -14,11 +15,12 @@ class DataView:
 
     def __cut(self, text_list):
         t = thulac.thulac()
-        for sentence in text_list:
-            for pair in t.cut(sentence):
-                yield pair
+        pairs = []
+        for sentence in tqdm(text_list,desc='分词：', ncols=70, ascii=True):
+            pairs += t.cut(sentence)
+        return pairs
 
-    def word_cloud(self, uid, color='black'):
+    def word_cloud(self, uid, color='black', flush=False):
         """返回生成的词云图片的路径"""
         wc = WordCloud(
             background_color=color,  # 设置背景颜色
@@ -32,13 +34,14 @@ class DataView:
         # 提取博文并去掉HTML标签
         texts = ""
         test = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})
-        if not test or not test['weibo']:
+        if flush or not test or not test['weibo']:
             Spider(uid, blogs=True, fans_follow=False)
         blogs = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})['weibo']
         for blog in blogs:
             texts += blog['text']
         texts = re.sub(r'<.*?>', '。', texts)
-        texts = texts.split('。')
+        texts = [s for s in texts.split('。') if len(s)>2]
+        json.dump({'tex':texts},open('./weibo_content.json', 'w', encoding='utf8'), ensure_ascii=False, indent=2)
 
         # jieba分词、去停用词、统计词频
         # jieba.add_word('微博')
@@ -57,16 +60,14 @@ class DataView:
         #     print("该用户没有发布微博！")
         #     return None
 
-        # thulac分词
-        # t = thulac.thulac()
-        stopw = json.load(open(path_manager.ANALYSIS + '/stop_words.json', encoding='utf8'))  # 加载停用词
 
-        print('开始分词')
-        # words_flag = t.cut(texts)
-        # print('分词结束')
+        # thulac分词
+        stopw = json.load(open(path_manager.ANALYSIS + '/stop_words.json', encoding='utf8'))  # 加载停用词
+        logger.info('开始分词')
         word_frequence = {}
-        for w,f in self.__cut(texts):
+        for w, f in tqdm(self.__cut(texts), ncols=70, ascii=True):
             if not w in stopw and not f in ['w', 'c', 'y']: # and len(w)>1:
+            # if not w in stopw and not f in ['w', 'c', 'y','o', 'u', 'p','d','q','zg'] and len(w)>1:
                 if w in word_frequence:
                     word_frequence[w] += 1
                 else:
@@ -75,12 +76,13 @@ class DataView:
             print("该用户没有发布微博！")
             return None
 
+        logger.info('分词结束')
         wcf = wc.generate_from_frequencies(word_frequence)
         path = path_manager.ASSETS + '/word_clouds/cloud_%s_%s.png' % (time.strftime('%m-%d-%H%M%S'),str(uid))
         wcf.to_file(path)
         return path
 
-    def blogs_to_xls(self, uid):
+    def blogs_to_xls(self, uid, flush=False):
         """
         功能：将uid对应用户所有微博文字内容及其分词写入excel
         返回：excel文件的路径
@@ -91,8 +93,8 @@ class DataView:
             blogs_data[k] = []
 
         test = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})
-        if not test or not test['weibo']:
-            Spider(uid)
+        if flush or not test or not test['weibo']:
+            Spider(uid, blogs=True)
         blogs = self.user_col.find_one({'_id': uid}, {'weibo': True, '_id': False})['weibo']
 
         for blog in blogs:
@@ -116,7 +118,7 @@ class DataView:
             profile_data[k] = []
         for uid in uids:
             if not self.user_col.find_one({'_id':uid}):
-                Spider(uid, False, False)
+                Spider(uid)
             user_profile = self.user_col.find_one({'_id': uid})
             for k in info:
                 profile_data[k].append(user_profile[k])
@@ -131,7 +133,7 @@ class DataView:
         """将用户的粉丝和关注者基本信息生成excel"""
         test = self.user_col.find_one({'_id': uid}, {'fans': True, '_id': False})
         if not test or not test['fans']:
-            Spider(uid)
+            Spider(uid,fans_follow=True)
         user_list = self.user_col.find_one({'_id':uid},{'fans':True})
         path = path_manager.ASSETS + '/fans/fans_%s_%s.xls' %(time.strftime('%m-%d-%H%M%S'),str(uid))
         return self.profile_to_xls(user_list['fans'], path)
@@ -140,7 +142,7 @@ class DataView:
         """将用户的粉丝和关注者基本信息生成excel"""
         test = self.user_col.find_one({'_id': uid}, {'follows': True, '_id': False})
         if not test or not test['follows']:
-            Spider(uid)
+            Spider(uid,fans_follow=True)
         user_list = self.user_col.find_one({'_id':uid},{'follows':True})
         path = path_manager.ASSETS + '/follows/follows_%s_%s.xls' %(time.strftime('%m-%d-%H%M%S'),str(uid))
         return self.profile_to_xls(user_list['follows'], path)

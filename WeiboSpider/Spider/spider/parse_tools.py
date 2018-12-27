@@ -35,13 +35,29 @@ def __parse_weibo_helper(blog):
     """（一条）博客对象"""
     blogObject = {
         'id': blog['id'],
+        'uid': blog['user']['id'],
         'date': blog['created_at'],
         'source': blog['source'],
         'reposts_count': blog['reposts_count'],
         'comments_count': blog['comments_count'],
         'attitudes_count': blog['attitudes_count'],
-        'text': blog['text']
+        'text': blog['text'],
+        'pics': [],
+        'attitudes': [],
+        'page_info': None
     }
+
+    # 地理位置信息
+    if 'page_info' in blog:
+        blogObject['page_info'] = [
+            blog['page_info']['page_title'],
+            blog['page_info']['page_url']
+        ]
+
+    # blog照片
+    if 'pics' in blog:
+        for pic in blog['pics']:
+            blogObject['pics'].append(pic['large']['url'])
     if 'retweeted_status' in blog:
         # 递归调用获取转发
         blogObject['repost'] = __parse_weibo_helper(blog['retweeted_status'])
